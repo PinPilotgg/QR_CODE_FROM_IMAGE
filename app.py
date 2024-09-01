@@ -62,7 +62,7 @@ def get_lat_lng_from_google_maps(address):
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     
-    service = Service(r"C:\Users\subha\Downloads\chromedriver-win64\chromedriver.exe")  
+    service = Service('./Chromedriver/chromedriver.exe')  
     driver = webdriver.Chrome(service=service, options=chrome_options)
     driver.get("https://maps.google.com")
     time.sleep(2)
@@ -83,7 +83,7 @@ def get_lat_lng_from_google_maps(address):
         return None, None
 
 def find_nearest_post_office(pincode, address_coords):
-    csv_file_path = r"C:\Users\subha\Downloads\pincode (1).csv"
+    csv_file_path = './pincode (1).csv'
     df = pd.read_csv(csv_file_path)
     filtered_df = df[(df['Pincode'] == int(pincode)) & (df['Delivery'] == 'Delivery')]
     
