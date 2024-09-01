@@ -1,0 +1,9 @@
+Flask
+opencv-python
+numpy
+Pillow
+easyocr
+qrcode
+pandas
+selenium
+geopy
