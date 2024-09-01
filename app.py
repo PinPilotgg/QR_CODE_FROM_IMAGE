@@ -15,9 +15,10 @@ import io
 import re
 import os
 import time
+import uuid
 
 app = Flask(__name__)
-API_KEY = "2023etb011.subhadeep@students.iiests.ac.in"  
+API_KEY = "2023etb011.subhadeep@students.iiests.ac.in"
 reader = easyocr.Reader(['en'])
 
 def extract_text_lines_from_image(image_path):
@@ -62,7 +63,7 @@ def get_lat_lng_from_google_maps(address):
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     
-    service = Service('./Chromedriver/chromedriver.exe')  
+    service = Service('./Chromedriver/chromedriver.exe')
     driver = webdriver.Chrome(service=service, options=chrome_options)
     driver.get("https://maps.google.com")
     time.sleep(2)
@@ -101,6 +102,7 @@ def find_nearest_post_office(pincode, address_coords):
             nearest_post_office = row
     
     return nearest_post_office
+
 def generate_qr_code(data):
     qr = qrcode.QRCode(
         version=1,
@@ -113,11 +115,8 @@ def generate_qr_code(data):
     img = qr.make_image(fill='black', back_color='white')
     return img
 
-import uuid  
-
 @app.route('/upload_image', methods=['POST'])
 def upload_image():
-  
     api_key = request.headers.get('API-KEY')
     if not api_key or api_key != API_KEY:
         return jsonify({'error': 'Invalid or missing API key'}), 401
@@ -155,13 +154,19 @@ def upload_image():
         qr_data = (
             f"Reference ID: {unique_id}\n"
             f"Address: {address}\n"
+            f"Pincode: {pincode}\n"
             f"Post Office: {post_office_info['OfficeName']}\n"
             f"District: {post_office_info['District']}\n"
             f"State: {post_office_info['StateName']}\n"
             f"Coordinates: {post_office_info['Latitude']}, {post_office_info['Longitude']}"
         )
     else:
-        qr_data = f"Reference ID: {unique_id}\nAddress: {address}\nNo nearby post office found."
+        qr_data = (
+            f"Reference ID: {unique_id}\n"
+            f"Address: {address}\n"
+            f"Pincode: {pincode}\n"
+            f"No nearby post office found."
+        )
     
     qr_img = generate_qr_code(qr_data)
 
@@ -169,7 +174,6 @@ def upload_image():
     qr_img.save(qr_img_path)
     
     return send_file(qr_img_path, mimetype='image/png')
-
 
 if __name__ == '__main__':
     app.run(debug=True)
